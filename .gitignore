@@ -1,4 +1,4 @@
-﻿# ===== Python =====
+# ===== Python =====
 __pycache__/
 *.py[cod]
 *$py.class
@@ -20,20 +20,13 @@ env/
 *.env
 !.env.example
 
-# ===== Dados e modelos (versionados pelo DVC, nao pelo Git) =====
-data/*
-!data/.gitkeep
+# ===== Modelos (versionados pelo DVC) =====
 models/*
 !models/.gitkeep
 
 # ===== MLflow =====
 mlruns/
 mlflow.db
-
-# ===== DVC =====
-/data/**/*.dvc
-.dvc/cache
-.dvc/tmp
 
 # ===== IDEs / SO =====
 .vscode/
