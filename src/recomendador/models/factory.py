@@ -43,8 +43,10 @@ def _build_registry() -> dict[str, type[BaseRecommender]]:
     Returns:
         Mapa de identificador para classe de modelo.
     """
+    from recomendador.models.baseline import MeanBaseline
     from recomendador.models.neural import NeuralRecommender
 
     return {
         "neural": NeuralRecommender,
+        "baseline": MeanBaseline,
     }
