@@ -1,0 +1,42 @@
+﻿# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ===== Ambientes virtuais =====
+.venv/
+venv/
+env/
+
+# ===== Variaveis de ambiente (segredos!) =====
+.env
+*.env
+!.env.example
+
+# ===== Dados e modelos (versionados pelo DVC, nao pelo Git) =====
+data/*
+!data/.gitkeep
+models/*
+!models/.gitkeep
+
+# ===== MLflow =====
+mlruns/
+mlflow.db
+
+# ===== DVC =====
+/data/**/*.dvc
+.dvc/cache
+.dvc/tmp
+
+# ===== IDEs / SO =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
