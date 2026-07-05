@@ -1,8 +1,8 @@
-"""Estagio de treino do pipeline DVC.
+"""Estagio de treino do pipeline DVC, com MLflow e registro de modelo.
 
-Le os dados processados (data/processed/interactions.parquet),
-treina o modelo neural e o baseline, compara metricas e registra
-tudo no MLflow. Salva as metricas em metrics.json para o DVC rastrear.
+Le os dados processados, treina o modelo neural e o baseline, compara
+metricas, registra tudo no MLflow (parametros, metricas e o modelo
+treinado) e salva as metricas em metrics.json para o DVC rastrear.
 
 Parametros do modelo podem ser sobrescritos por variaveis de ambiente.
 
@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 
 import mlflow
+import mlflow.pytorch
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -32,6 +33,7 @@ EPOCHS = int(os.getenv("EPOCHS", "5"))
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "256"))
 
 EXPERIMENT_NAME = "recomendador-ecommerce"
+REGISTERED_MODEL_NAME = "recomendador-neural"
 
 
 def main() -> None:
@@ -100,6 +102,14 @@ def main() -> None:
             "baseline_mae": m_baseline["mae"],
         }
         mlflow.log_metrics(metricas)
+
+        # Registra o modelo neural no MLflow (habilita o Model Registry)
+        print("Registrando modelo no MLflow...")
+        mlflow.pytorch.log_model(
+            neural.model,
+            artifact_path="model",
+            registered_model_name=REGISTERED_MODEL_NAME,
+        )
 
         Path(METRICS_PATH).write_text(json.dumps(metricas, indent=2))
 
