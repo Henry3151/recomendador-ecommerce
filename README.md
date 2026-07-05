@@ -53,6 +53,19 @@ Um e-commerce com milhoes de eventos de navegacao precisa sugerir produtos relev
 
 ---
 
+
+### Analise exploratoria dos dados
+
+O funil de e-commerce revela o desafio central: a esmagadora maioria das interacoes sao visualizacoes, com pouquissimas compras.
+
+![Funil de eventos](reports/figures/01_funil_eventos.png)
+
+A distribuicao de interacoes por usuario mostra a "cauda longa" -- a maioria dos usuarios interage com pouquissimos itens, justificando o k-core filtering.
+
+![Cauda longa](reports/figures/04_cauda_longa.png)
+
+---
+
 ## Pipeline
 
 ```
@@ -78,6 +91,15 @@ MLflow: params + metrics + modelo registrado
 ```
 
 Todo o fluxo `prepare -> train` e orquestrado pelo DVC e reproduzivel com um unico comando: `dvc repro`.
+
+---
+
+
+### Impacto do k-core filtering
+
+O filtro remove usuarios e itens raros, reduzindo o ruido em 71,6% e preservando as interacoes densas.
+
+![Impacto do k-core](reports/figures/02_impacto_kcore.png)
 
 ---
 
@@ -148,6 +170,9 @@ Tres experimentos rastreados no MLflow, variando hiperparametros:
 | **v2 (producao)** | **64** | **5** | **0.1843** | **0.101** |
 | v3 | 32 | 10 | 0.1887 | 0.104 |
 | Baseline (media) | -- | -- | 0.1893 | 0.0986 |
+
+
+![Comparacao de modelos](reports/figures/03_comparacao_modelos.png)
 
 > A versao 2 (embedding maior) obteve o menor RMSE e foi promovida automaticamente a producao. Aumentar epocas (v3) piorou o resultado -- indicativo de leve overfitting.
 
