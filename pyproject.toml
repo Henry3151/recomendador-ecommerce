@@ -31,6 +31,15 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/recomendador"]
 
+# ----- PyTorch CPU (imagem Docker mais leve e estavel) -----
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
