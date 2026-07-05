@@ -255,6 +255,19 @@ docker run --rm -v "${PWD}/data:/app/data" recomendador-ecommerce
 
 ---
 
+### 8. Usar a imagem publicada (GHCR)
+
+A imagem esta publicada no GitHub Container Registry e pode ser usada sem build local:
+
+```bash
+docker pull ghcr.io/henry3151/recomendador-ecommerce:latest
+docker run --rm -v "${PWD}/data:/app/data" ghcr.io/henry3151/recomendador-ecommerce:latest
+```
+
+Pacote: https://github.com/Henry3151/recomendador-ecommerce/pkgs/container/recomendador-ecommerce
+
+---
+
 ## O que este projeto demonstra
 
 - **Clean code aplicado a ML** -- design patterns (Strategy, Factory), type hints, docstrings Google style, linting automatizado com ruff
