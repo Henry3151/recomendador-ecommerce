@@ -1,0 +1,35 @@
+# ============================================================
+# docker-compose: orquestra os servicos do projeto.
+#
+# Servico "mlflow": servidor da interface de tracking (porta 5000).
+# Servico "train": executa o treino e registra no mlflow.
+#
+# Uso:
+#   docker compose up mlflow      # sobe so a interface do MLflow
+#   docker compose up train       # roda o treino
+#   docker compose up             # sobe ambos
+# ============================================================
+
+services:
+  mlflow:
+    image: recomendador-ecommerce
+    command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri file:/app/mlruns
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlruns:/app/mlruns
+    environment:
+      - MLFLOW_TRACKING_URI=file:/app/mlruns
+
+  train:
+    image: recomendador-ecommerce
+    command: python -m recomendador.training.train
+    depends_on:
+      - mlflow
+    volumes:
+      - ./data:/app/data
+      - ./mlruns:/app/mlruns
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - EMBEDDING_DIM=64
+      - EPOCHS=5
