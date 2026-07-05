@@ -1,0 +1,58 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: uv run python -m recomendador.data.prepare
+    deps:
+    - path: data/raw/events.csv
+      hash: md5
+      md5: fddaf7c1c6a9df23a726500a08ffdd7e
+      size: 94237913
+    - path: src/recomendador/data/loader.py
+      hash: md5
+      md5: 588ea0e871b25cc797e594dee1a40c33
+      size: 1732
+    - path: src/recomendador/data/prepare.py
+      hash: md5
+      md5: adc03a5274414a38b9c84b8bca5b7932
+      size: 2127
+    - path: src/recomendador/preprocessing/pipeline.py
+      hash: md5
+      md5: d374808ba05901f981872e58d3c638f5
+      size: 3076
+    - path: src/recomendador/preprocessing/preprocessors.py
+      hash: md5
+      md5: 8df95c97814333680277ce604cc0089c
+      size: 2179
+    outs:
+    - path: data/processed/interactions.parquet
+      hash: md5
+      md5: f28e82e9b8a290b00ff5d947b04351e5
+      size: 745202
+  train:
+    cmd: uv run python -m recomendador.training.train
+    deps:
+    - path: data/processed/interactions.parquet
+      hash: md5
+      md5: f28e82e9b8a290b00ff5d947b04351e5
+      size: 745202
+    - path: src/recomendador/evaluation/metrics.py
+      hash: md5
+      md5: 0a44c7e8265528e17ba54d9b281bcba3
+      size: 744
+    - path: src/recomendador/models/baseline.py
+      hash: md5
+      md5: 4eee0bac2e74a69b4f32e3040427ea7b
+      size: 1274
+    - path: src/recomendador/models/neural.py
+      hash: md5
+      md5: 99e585350298d0548473e8a51b0ea348
+      size: 4097
+    - path: src/recomendador/training/train.py
+      hash: md5
+      md5: f4109e0f4be8c85f2c0b358b57c0ab7c
+      size: 3729
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: 824ddc9e93ce8494232403ea97c6f62b
+      size: 160
