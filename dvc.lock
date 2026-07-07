@@ -37,16 +37,16 @@ stages:
       size: 745202
     - path: src/recomendador/models/neural.py
       hash: md5
-      md5: 92a822e838a8471961df501f094ce2ed
-      size: 5819
+      md5: 9a7b08a3f62a8da2855b3cc6b000ac01
+      size: 5981
     - path: src/recomendador/training/train.py
       hash: md5
-      md5: af69636a12c5d8817f98f3bbbcb01ec5
-      size: 3207
+      md5: 136ee6c8389d299ceccc323037641efd
+      size: 3309
     outs:
     - path: models/neural.pt
       hash: md5
-      md5: ef8a89c9fdec0ce47b1a00f8ea894398
+      md5: 26659f3b7718c30f171c1132122d1ba6
       size: 7302345
     - path: models/train_info.json
       hash: md5
@@ -57,20 +57,20 @@ stages:
     deps:
     - path: data/raw/events.csv
       hash: md5
-      md5: fddaf7c1c6a9df23a726500a08ffdd7e
-      size: 94237913
+      md5: fca48dcdb607fbe2932bd192684d5ca1
+      size: 96994015
     - path: src/recomendador/data/loader.py
       hash: md5
-      md5: 588ea0e871b25cc797e594dee1a40c33
-      size: 1732
+      md5: b46d50beddb181cacc15a42fa0d833ea
+      size: 1786
     - path: src/recomendador/data/prepare.py
       hash: md5
-      md5: 06e25914baad725f8912c16c6eef0e77
-      size: 1694
+      md5: f704eb0ced896686d6f9817cf5a48999
+      size: 1756
     - path: src/recomendador/preprocessing/pipeline.py
       hash: md5
-      md5: d374808ba05901f981872e58d3c638f5
-      size: 3076
+      md5: 8ad62faf4ac6cddb978d3479be4905ce
+      size: 3167
     outs:
     - path: data/processed/clean.parquet
       hash: md5
@@ -85,12 +85,12 @@ stages:
       size: 771256
     - path: src/recomendador/data/feature_eng.py
       hash: md5
-      md5: 50ae39a959d67c374c80e1aa18ccfde9
-      size: 1212
+      md5: 6c17d1e7a6eb11c6675ee7629b467d12
+      size: 1253
     - path: src/recomendador/preprocessing/preprocessors.py
       hash: md5
-      md5: 8df95c97814333680277ce604cc0089c
-      size: 2179
+      md5: b008ff5a1a8c684a79867307c3d043c3
+      size: 2253
     outs:
     - path: data/processed/features.parquet
       hash: md5
@@ -101,22 +101,22 @@ stages:
     deps:
     - path: models/neural.pt
       hash: md5
-      md5: ef8a89c9fdec0ce47b1a00f8ea894398
+      md5: 26659f3b7718c30f171c1132122d1ba6
       size: 7302345
     - path: src/recomendador/evaluation/evaluate.py
       hash: md5
-      md5: 2da69beb98237ebecdf8a714d3dd192f
-      size: 3255
+      md5: c687a0c34a4f1b561513ade070472077
+      size: 3352
     - path: src/recomendador/evaluation/metrics.py
       hash: md5
-      md5: e242d4e863e92c1c9436e0ade1749338
-      size: 2471
+      md5: 46cd6d90ba76b58c03582b7bdec9086a
+      size: 2552
     - path: src/recomendador/models/baseline.py
       hash: md5
-      md5: 4eee0bac2e74a69b4f32e3040427ea7b
-      size: 1274
+      md5: d614f9de95d71735369fc8e131f5e44e
+      size: 1314
     outs:
     - path: metrics.json
       hash: md5
-      md5: a01a012fd21c347d4cc6fff7422b2d63
+      md5: 45e5d78900d358c7ed93488010383a91
       size: 325
