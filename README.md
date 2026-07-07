@@ -16,6 +16,9 @@
 ## Autor
 
 **Henrique Silva** -- Data Scientist | ML Engineer
+**Sarah Novais** -- Data Analyst
+**Caio Terencio** 
+**Gustavo**
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-henrique--silva--ds-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/henrique-silva-ds)
 [![GitHub](https://img.shields.io/badge/GitHub-Henry3151-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Henry3151)
