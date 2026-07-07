@@ -15,8 +15,8 @@
 
 ## Autor
 
-- **Henrique Silva** -- Data Scientist | ML Engineer
-- **Sarah Novais** -- Data Analyst
+- **Henrique Silva** - Data Scientist | ML Engineer
+- **Sarah Novais** - Data Analyst
 - **Caio Terencio** 
 - **Gustavo**
 
