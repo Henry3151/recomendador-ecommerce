@@ -1,10 +1,8 @@
-"""Estagio de preparacao de dados do pipeline DVC.
+"""Estagio 1 do pipeline: preprocessamento (limpeza).
 
-Le o dataset bruto versionado (data/raw/events.csv), aplica
-o preprocessamento (k-core, amostragem, normalizacao, reindexacao)
-e salva o resultado em data/processed/interactions.parquet.
-
-Este e o primeiro estagio do pipeline reproduzivel (dvc.yaml).
+Le o dataset bruto, aplica k-core filtering e amostragem, e salva
+as interacoes limpas. A normalizacao e reindexacao ficam no estagio
+seguinte (feature_eng).
 
 Uso:
     uv run python -m recomendador.data.prepare
@@ -15,11 +13,10 @@ from pathlib import Path
 import numpy as np
 
 from recomendador.data.loader import load_retailrocket
-from recomendador.preprocessing.pipeline import apply_kcore, reindex_ids
-from recomendador.preprocessing.preprocessors import MinMaxRatingStrategy
+from recomendador.preprocessing.pipeline import apply_kcore
 
 RAW_PATH = "data/raw/events.csv"
-PROCESSED_PATH = "data/processed/interactions.parquet"
+CLEAN_PATH = "data/processed/clean.parquet"
 KCORE = 5
 SAMPLE_USERS = 20000
 SEED = 42
@@ -47,7 +44,7 @@ def _sample_users(df, n_users, seed):
 
 
 def main() -> None:
-    """Executa a preparacao e salva os dados processados."""
+    """Executa a limpeza e salva as interacoes."""
     print("Carregando dataset bruto...")
     df = load_retailrocket(RAW_PATH)
 
@@ -56,17 +53,9 @@ def main() -> None:
     df = _sample_users(df, SAMPLE_USERS, SEED)
     df = apply_kcore(df, k=KCORE)
 
-    print("Normalizando e reindexando...")
-    df = MinMaxRatingStrategy().apply(df)
-    df, _, _ = reindex_ids(df)
-
     Path("data/processed").mkdir(parents=True, exist_ok=True)
-    df.to_parquet(PROCESSED_PATH, index=False)
-
-    print(f"Dados salvos em {PROCESSED_PATH}")
-    print(f"  Interacoes: {len(df)}")
-    print(f"  Usuarios: {df['user_id'].nunique()}")
-    print(f"  Itens: {df['item_id'].nunique()}")
+    df.to_parquet(CLEAN_PATH, index=False)
+    print(f"Dados limpos salvos em {CLEAN_PATH} ({len(df)} interacoes)")
 
 
 if __name__ == "__main__":

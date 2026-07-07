@@ -1,10 +1,8 @@
-"""Estagio de treino do pipeline DVC, com MLflow e registro de modelo.
+"""Estagio de treino do pipeline DVC.
 
-Le os dados processados, treina o modelo neural e o baseline, compara
-metricas, registra tudo no MLflow (parametros, metricas e o modelo
-treinado) e salva as metricas em metrics.json para o DVC rastrear.
-
-Parametros do modelo podem ser sobrescritos por variaveis de ambiente.
+Le os dados processados, treina o modelo neural (com early stopping)
+e registra no MLflow. Salva o modelo treinado para o estagio de
+avaliacao usar. Parametros sobrescreviveis por variaveis de ambiente.
 
 Uso:
     uv run python -m recomendador.training.train
@@ -17,27 +15,27 @@ from pathlib import Path
 import mlflow
 import mlflow.pytorch
 import pandas as pd
+import torch
 from sklearn.model_selection import train_test_split
 
-from recomendador.evaluation.metrics import compute_metrics
-from recomendador.models.baseline import MeanBaseline
 from recomendador.models.neural import NeuralRecommender
 
-PROCESSED_PATH = "data/processed/interactions.parquet"
-METRICS_PATH = "metrics.json"
+FEATURES_PATH = "data/processed/features.parquet"
+MODEL_PATH = "models/neural.pt"
+TRAIN_INFO_PATH = "models/train_info.json"
 SEED = 42
 
-EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", "32"))
+EMBEDDING_DIM = int(os.getenv("EMBEDDING_DIM", "64"))
 LEARNING_RATE = float(os.getenv("LEARNING_RATE", "0.001"))
-EPOCHS = int(os.getenv("EPOCHS", "5"))
+EPOCHS = int(os.getenv("EPOCHS", "20"))
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "256"))
+PATIENCE = int(os.getenv("PATIENCE", "3"))
 
 EXPERIMENT_NAME = "recomendador-ecommerce"
-REGISTERED_MODEL_NAME = "recomendador-neural"
 
 
 def main() -> None:
-    """Executa o treino a partir dos dados processados."""
+    """Treina o modelo e salva para avaliacao."""
     mlflow.set_experiment(EXPERIMENT_NAME)
 
     with mlflow.start_run():
@@ -47,19 +45,20 @@ def main() -> None:
                 "learning_rate": LEARNING_RATE,
                 "epochs": EPOCHS,
                 "batch_size": BATCH_SIZE,
+                "patience": PATIENCE,
                 "seed": SEED,
             }
         )
 
-        print("Carregando dados processados...")
-        df = pd.read_parquet(PROCESSED_PATH)
+        print("Carregando features...")
+        df = pd.read_parquet(FEATURES_PATH)
         n_users = int(df["user_id"].max()) + 1
         n_items = int(df["item_id"].max()) + 1
         print(f"  Interacoes: {len(df)} | Usuarios: {n_users} | Itens: {n_items}")
 
         treino, teste = train_test_split(df, test_size=0.2, random_state=SEED)
 
-        print("Treinando modelo neural...")
+        print("Treinando modelo neural (com early stopping)...")
         neural = NeuralRecommender(
             n_users=n_users,
             n_items=n_items,
@@ -68,60 +67,35 @@ def main() -> None:
             epochs=EPOCHS,
             batch_size=BATCH_SIZE,
             seed=SEED,
+            patience=PATIENCE,
         )
         neural.fit(
             treino["user_id"].to_numpy(),
             treino["item_id"].to_numpy(),
             treino["rating"].to_numpy(),
         )
+        print(f"  Early stopping: melhor epoca = {neural.best_epoch}")
+        mlflow.log_metric("best_epoch", neural.best_epoch)
 
-        print("Treinando baseline...")
-        baseline = MeanBaseline()
-        baseline.fit(
-            treino["user_id"].to_numpy(),
-            treino["item_id"].to_numpy(),
-            treino["rating"].to_numpy(),
-        )
-
-        print("Avaliando...")
-        y_true = teste["rating"].to_numpy()
-        pred_neural = neural.predict(
-            teste["user_id"].to_numpy(), teste["item_id"].to_numpy()
-        )
-        pred_baseline = baseline.predict(
-            teste["user_id"].to_numpy(), teste["item_id"].to_numpy()
-        )
-
-        m_neural = compute_metrics(y_true, pred_neural)
-        m_baseline = compute_metrics(y_true, pred_baseline)
-
-        metricas = {
-            "neural_rmse": m_neural["rmse"],
-            "neural_mae": m_neural["mae"],
-            "baseline_rmse": m_baseline["rmse"],
-            "baseline_mae": m_baseline["mae"],
+        # Salva o modelo e o conjunto de teste para o estagio de avaliacao
+        Path("models").mkdir(exist_ok=True)
+        torch.save(neural.model.state_dict(), MODEL_PATH)
+        info = {
+            "n_users": n_users,
+            "n_items": n_items,
+            "embedding_dim": EMBEDDING_DIM,
+            "best_epoch": neural.best_epoch,
         }
-        mlflow.log_metrics(metricas)
+        Path(TRAIN_INFO_PATH).write_text(json.dumps(info, indent=2))
+        teste.to_parquet("data/processed/test.parquet", index=False)
 
-        # Registra o modelo neural no MLflow (habilita o Model Registry)
-        print("Registrando modelo no MLflow...")
+        # Registra o modelo no MLflow Model Registry
         mlflow.pytorch.log_model(
             neural.model,
             artifact_path="model",
-            registered_model_name=REGISTERED_MODEL_NAME,
+            registered_model_name="recomendador-neural",
         )
-
-        Path(METRICS_PATH).write_text(json.dumps(metricas, indent=2))
-
-        print()
-        print("=" * 40)
-        print("RESULTADOS (menor = melhor)")
-        print("=" * 40)
-        print(f"{'Metrica':<10}{'Neural':>12}{'Baseline':>14}")
-        print(f"{'RMSE':<10}{m_neural['rmse']:>12.4f}{m_baseline['rmse']:>14.4f}")
-        print(f"{'MAE':<10}{m_neural['mae']:>12.4f}{m_baseline['mae']:>14.4f}")
-        print("=" * 40)
-        print(f"Run: emb={EMBEDDING_DIM}, lr={LEARNING_RATE}, epochs={EPOCHS}")
+        print("Modelo salvo e registrado no MLflow.")
 
 
 if __name__ == "__main__":

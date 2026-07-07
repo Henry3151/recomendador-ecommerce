@@ -1,23 +1,40 @@
 stages:
-  prepare:
+  preprocess:
     cmd: uv run python -m recomendador.data.prepare
     deps:
       - src/recomendador/data/prepare.py
       - src/recomendador/data/loader.py
       - src/recomendador/preprocessing/pipeline.py
-      - src/recomendador/preprocessing/preprocessors.py
       - data/raw/events.csv
     outs:
-      - data/processed/interactions.parquet
+      - data/processed/clean.parquet
+
+  feature_eng:
+    cmd: uv run python -m recomendador.data.feature_eng
+    deps:
+      - src/recomendador/data/feature_eng.py
+      - src/recomendador/preprocessing/preprocessors.py
+      - data/processed/clean.parquet
+    outs:
+      - data/processed/features.parquet
 
   train:
     cmd: uv run python -m recomendador.training.train
     deps:
       - src/recomendador/training/train.py
       - src/recomendador/models/neural.py
-      - src/recomendador/models/baseline.py
+      - data/processed/features.parquet
+    outs:
+      - models/neural.pt
+      - models/train_info.json
+
+  evaluate:
+    cmd: uv run python -m recomendador.evaluation.evaluate
+    deps:
+      - src/recomendador/evaluation/evaluate.py
       - src/recomendador/evaluation/metrics.py
-      - data/processed/interactions.parquet
+      - src/recomendador/models/baseline.py
+      - models/neural.pt
     metrics:
       - metrics.json:
           cache: false
