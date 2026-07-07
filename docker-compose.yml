@@ -12,7 +12,8 @@
 
 services:
   mlflow:
-    image: recomendador-ecommerce
+    build: .
+    image: recomendador-ecommerce:latest
     command: mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri file:/app/mlruns
     ports:
       - "5000:5000"
@@ -22,7 +23,8 @@ services:
       - MLFLOW_TRACKING_URI=file:/app/mlruns
 
   train:
-    image: recomendador-ecommerce
+    build: .
+    image: recomendador-ecommerce:latest
     command: python -m recomendador.training.train
     depends_on:
       - mlflow
@@ -33,3 +35,4 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
       - EMBEDDING_DIM=64
       - EPOCHS=5
+      - GIT_PYTHON_REFRESH=quiet
