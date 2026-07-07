@@ -314,3 +314,5 @@ Pacote: https://github.com/Henry3151/recomendador-ecommerce/pkgs/container/recom
 - Koren, Y., Bell, R. & Volinsky, C. (2009). *Matrix Factorization Techniques for Recommender Systems*. IEEE Computer.
 - He, X. et al. (2017). *Neural Collaborative Filtering*. WWW.
 - Dataset: [RetailRocket E-commerce Dataset](https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset)
+
+Teste
