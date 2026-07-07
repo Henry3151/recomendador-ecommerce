@@ -1,6 +1,6 @@
 {
-  "neural_rmse": 0.18522721982720056,
-  "neural_mae": 0.09737747298570595,
+  "neural_rmse": 0.18518536711601213,
+  "neural_mae": 0.09732678936933983,
   "neural_precision_at_k": 0.6,
   "neural_recall_at_k": 0.002067539627842867,
   "baseline_rmse": 0.18928563520435213,
